@@ -1,5 +1,14 @@
 import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import dotenv from "dotenv";
+import connectDB from './config/db.js';
+
 const app = express();
+dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 app.get('/', (req, res) => {
 	res.send('Hello from Node.js server!');
