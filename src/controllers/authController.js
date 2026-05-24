@@ -24,6 +24,7 @@ export const register = async (req, res) => {
 		if (existingUser) {
 			return res.status(400).json({ message: "Email already in use" });
 		}
+
 		// Create new user
 		const newUser = new User({
 			name,
@@ -42,7 +43,7 @@ export const register = async (req, res) => {
 
 		res.cookie("token", token, {
 			httpOnly: true,
-			secure: false, // true in production (HTTPS)
+			secure: process.env.environment === "production", // true in production (HTTPS)
 			sameSite: "strict",
 			maxAge: 24 * 60 * 60 * 1000 // 1 day
 		});
