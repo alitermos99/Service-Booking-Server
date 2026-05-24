@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from "dotenv";
 import connectDB from './config/db.js';
 import cookieParser from "cookie-parser";
+import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,9 @@ connectDB();
 app.get('/', (req, res) => {
 	res.send('Hello from Node.js server!');
 });
+
+// Error middleware MUST be last
+app.use(errorMiddleware);
 
 const port = process.env.PORT || 3000;
 
