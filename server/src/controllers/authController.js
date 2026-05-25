@@ -3,104 +3,74 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import asyncHandler from "express-async-handler";
 import { validatePassword } from "../utils/passwordValidator.js";
-
-const generateToken = (user) => {
-	return jwt.sign(
-		{ id: user._id },
-		process.env.JWT_SECRET,
-		{ expiresIn: "24h" }
-	);
-};
+import transporter from "../services/emailService.js";
+import { getUserOrThrow } from "../utils/userUtils.js";
+import { validatePasswordOrThrow } from "../utils/validationUtils.js";
+import { COOKIE_OPTIONS, sanitizeUser, generateAuthToken, generatePasswordResetToken  } from "../utils/authUtils.js";
 
 export const register = asyncHandler(async (req, res) => {
 	const { name, email, password, phone } = req.body;
-	
+
 	if (!name || !email || !password) {
 		res.status(400);
 		throw new Error("Name, email, and password are required");
 	}
 
-	if (!validatePassword(password)) {
-		res.status(400);
-		throw new Error("Password must be at least 6 characters long and include uppercase, lowercase, number, and special character");
-	}
-	
-	// Check if user already exists
+	validatePasswordOrThrow(password);
+
 	const existingUser = await User.findOne({ email });
-	
+
 	if (existingUser) {
 		res.status(400);
 		throw new Error("Email already in use");
 	}
-	
-	// Create user
-	const newUser = new User({
+
+	const user = await User.create({
 		name,
 		email,
 		password,
 		phone
 	});
-	
-	await newUser.save();
-	
-	// Remove password
-	const newUserNoPassword = newUser.toObject();
-	delete newUserNoPassword.password;
-	
-	// Generate token
-	const token = generateToken(newUser);
-	
-	// Set cookie
-	res.cookie("token", token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",
-		maxAge: 24 * 60 * 60 * 1000
-	});
-	
+
+	res.cookie(
+		"token",
+		generateAuthToken(user._id),
+		COOKIE_OPTIONS
+	);
+
 	return res.status(201).json({
 		message: "User registered successfully",
-		user: newUserNoPassword
+		user: sanitizeUser(user)
 	});
 });
 
 export const login = asyncHandler(async (req, res) => {
 	const { email, password } = req.body;
-	
-	if(!email || !password) {
+
+	if (!email || !password) {
 		res.status(400);
 		throw new Error("Email and password are required");
 	}
-	
-	// Check if user exists and password matches
+
 	const user = await User.findOne({ email });
-	
-	if (!user) {
+
+	if (
+		!user ||
+		!(await bcrypt.compare(password, user.password))
+	) {
 		res.status(400);
 		throw new Error("Invalid email or password");
 	}
 
-	const isMatch = await bcrypt.compare(password, user.password);
+	res.cookie(
+		"token",
+		generateAuthToken(user._id),
+		COOKIE_OPTIONS
+	);
 
-	if (!isMatch) {
-		res.status(400);
-		throw new Error("Invalid email or password");
-	}
-	
-	const token = generateToken(user);
-	
-	res.cookie("token", token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production", // true in production (HTTPS)
-		sameSite: "strict",
-		maxAge: 24 * 60 * 60 * 1000 // 1 day
+	return res.status(200).json({
+		user: sanitizeUser(user)
 	});
-	
-	return res.status(200).json({ user: {
-		name: user.name,
-		email: user.email,
-		phone: user.phone
-	}});
 });
 
 export const logout = asyncHandler(async (req, res) => {
@@ -141,21 +111,82 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
 export const changePassword = asyncHandler(async (req, res) => {
 	const { currentPassword, newPassword } = req.body;
-	const userToUpdate = await User.findById(req.user.id);
 
-	if (!userToUpdate) {
+	if (!currentPassword || !newPassword) {
+		res.status(400);
+		throw new Error(
+			"Current password and new password are required"
+		);
+	}
+
+	const user = await getUserOrThrow(req.user.id);
+
+	const isMatch = await bcrypt.compare(
+		currentPassword,
+		user.password
+	);
+
+	if (!isMatch) {
+		res.status(400);
+		throw new Error("Current password is incorrect");
+	}
+
+	validatePasswordOrThrow(newPassword);
+
+	user.password = newPassword;
+
+	await user.save();
+
+	return res.status(200).json({
+		message: "Password changed successfully"
+	});
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+	const { email } = req.body;
+
+	if(!email) {
+		res.status(400);
+		throw new Error("Email is required");
+	}
+
+	const user = await User.findOne({ email });
+
+	if (!user) {
 		res.status(404);
 		throw new Error("User not found");
 	}
 
-	if (!currentPassword || !newPassword) {
-		res.status(400);
-		throw new Error("Current password and new password are required");
+	const resetToken = generatePasswordResetToken(user._id);
+	const url = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+	await transporter.sendMail({
+		to: user.email,
+		subject: "Password Reset Request",
+		text: `You requested a password reset. Click the link to reset your password: ${url}`
+	});
+
+	return res.status(200).json({ message: "Password reset email sent" });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+	const { token, newPassword } = req.body;
+
+	if(!token) {
+		res.status(401);
+		throw new Error("Unauthorized Access");
 	}
 
-	if(currentPassword === newPassword) {
+	const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+	if (decoded.purpose !== "password_reset") {
 		res.status(400);
-		throw new Error("New password must be different from current password");
+		throw new Error("Invalid token");
+	}
+
+	if(!newPassword) {
+		res.status(400);
+		throw new Error("New password is required");
 	}
 
 	if(!validatePassword(newPassword)) {
@@ -163,14 +194,22 @@ export const changePassword = asyncHandler(async (req, res) => {
 		throw new Error("New password must be at least 6 characters long and include uppercase, lowercase, number, and special character");
 	}
 
-	const isMatch = await bcrypt.compare(currentPassword, userToUpdate.password);
+	const user = await User.findById(decoded.id);
 
-	if (!isMatch) {
-		res.status(400);
-		throw new Error("Current password is incorrect");
+	if (!user) {
+		res.status(404);
+		throw new Error("User not found");
 	}
 
-	userToUpdate.password = newPassword;
-	await userToUpdate.save();
-	return res.status(200).json({ message: "Password changed successfully" });
+	user.password = newPassword;
+	await user.save();
+	return res.status(200).json({ message: "Password reset successfully" });
+});
+
+export const getProfile = asyncHandler(async (req, res) => {
+	const user = await getUserOrThrow(req.user.id);
+
+	return res.status(200).json({
+		user: sanitizeUser(user)
+	});
 });
