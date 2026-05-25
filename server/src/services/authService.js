@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import transporter from "../services/emailService.js";
-import { getUserOrThrow } from "../utils/userUtils.js";
+import { getUserOrThrow, getUserByEmailOrThrow } from "../utils/userUtils.js";
 import { validatePasswordOrThrow } from "../utils/validationUtils.js";
 import { generatePasswordResetToken  } from "../utils/authUtils.js";
 import ApiError from "../errors/ApiError.js";
@@ -14,11 +14,10 @@ export const registerUser = async ({ name, email, password, phone = '' }) => {
 
 	validatePasswordOrThrow(password);
 
-	const existingUser = await User.findOne({ email });
+	const existingUser = await getUserByEmailOrThrow(email);
 
 	if (existingUser) {
-		res.status(400);
-		throw new Error("Email already in use");
+		throw new ApiError("Email already in use", 400);
 	}
 
 	const user = await User.create({
@@ -40,8 +39,7 @@ export const loginUser = async ({ email, password }) => {
 		throw new ApiError("Email and password are required", 400);
 	}
 
-	const user = await User.findOne({ email });
-
+	const user = await getUserByEmailOrThrow(email);
 	if (
 		!user ||
 		!(await bcrypt.compare(password, user.password))
@@ -54,10 +52,6 @@ export const loginUser = async ({ email, password }) => {
 
 export const updateUserProfile = async (userId, { name, phone }) => {
 	const user = await getUserOrThrow(userId);
-
-	if (!user) {
-		throw new ApiError("User not found", 404);
-	}
 
 	if (name) {
 		user.name = name;
@@ -81,7 +75,6 @@ export const changeUserPassword = async (userId, { currentPassword, newPassword 
 	}
 
 	const user = await getUserOrThrow(userId);
-
 	const isMatch = await bcrypt.compare(
 		currentPassword,
 		user.password
@@ -107,12 +100,7 @@ export const forgotUserPassword = async ({ email }) => {
 		throw new ApiError("Email is required", 400);
 	}
 
-	const user = await User.findOne({ email });
-
-	if (!user) {
-		throw new ApiError("User not found", 404);
-	}
-
+	const user = await getUserByEmailOrThrow(email);
 	const resetToken = generatePasswordResetToken(user._id);
 	const url = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
@@ -141,11 +129,6 @@ export const resetUserPassword = async ({ token, newPassword }) => {
 	validatePasswordOrThrow(newPassword);
 
 	const user = await getUserOrThrow(decoded.id);
-
-	if (!user) {
-		throw new ApiError("User not found", 404);
-	}
-
 	user.password = newPassword;
 	await user.save();
 }

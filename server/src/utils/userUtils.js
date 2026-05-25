@@ -1,12 +1,21 @@
 import User from "../models/User.js";
+import ApiError from "../errors/ApiError.js";
 
 export const getUserOrThrow = async (userId) => {
 	const user = await User.findById(userId);
 
 	if (!user) {
-		const error = new Error("User not found");
-		error.statusCode = 404;
-		throw error;
+		throw new ApiError("User not found", 404);
+	}
+
+	return user;
+};
+
+export const getUserByEmailOrThrow = async (email) => {
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		throw new ApiError("User not found", 404);
 	}
 
 	return user;
