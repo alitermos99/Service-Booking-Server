@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema(
 		password: {
 			type: String,
 			required: true,
+			minlength: 6,
+  			match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/
 		},
 		phone: {
 			type: String,
@@ -38,18 +40,13 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
 	if (!this.isModified("password")) {
-		return next();
+		return;
 	}
 
-	try {
-		const salt = await bcrypt.genSalt(10);
-		this.password = await bcrypt.hash(this.password, salt);
-		next();
-	} catch (error) {
-		return error
-	}
+	const salt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, salt);
 });
 
 export default mongoose.model("User", userSchema);

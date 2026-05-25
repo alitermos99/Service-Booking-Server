@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import asyncHandler from "express-async-handler";
+import { validatePassword } from "../utils/passwordValidator.js";
 
 const generateToken = (user) => {
 	return jwt.sign(
@@ -12,11 +13,16 @@ const generateToken = (user) => {
 };
 
 export const register = asyncHandler(async (req, res) => {
-	const { name, email, password, phone, role } = req.body;
+	const { name, email, password, phone } = req.body;
 	
 	if (!name || !email || !password) {
 		res.status(400);
 		throw new Error("Name, email, and password are required");
+	}
+
+	if (!validatePassword(password)) {
+		res.status(400);
+		throw new Error("Password must be at least 6 characters long and include uppercase, lowercase, number, and special character");
 	}
 	
 	// Check if user already exists
@@ -32,8 +38,7 @@ export const register = asyncHandler(async (req, res) => {
 		name,
 		email,
 		password,
-		phone,
-		role
+		phone
 	});
 	
 	await newUser.save();
@@ -107,4 +112,65 @@ export const logout = asyncHandler(async (req, res) => {
 	});
 	
 	return res.status(200).json({ message: "Logged out successfully" });
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+	const { name, phone } = req.body;
+	const userToUpdate = await User.findById(req.user.id);
+
+	if (!userToUpdate) {
+		res.status(404);
+		throw new Error("User not found");
+	}
+
+	if (name) {
+		userToUpdate.name = name;
+	}
+
+	if (phone) {
+		userToUpdate.phone = phone;
+	}
+
+	await userToUpdate.save();
+	return res.status(200).json({ message: "Profile updated successfully", user: {
+		name: userToUpdate.name,
+		email: userToUpdate.email,
+		phone: userToUpdate.phone
+	} });
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+	const { currentPassword, newPassword } = req.body;
+	const userToUpdate = await User.findById(req.user.id);
+
+	if (!userToUpdate) {
+		res.status(404);
+		throw new Error("User not found");
+	}
+
+	if (!currentPassword || !newPassword) {
+		res.status(400);
+		throw new Error("Current password and new password are required");
+	}
+
+	if(currentPassword === newPassword) {
+		res.status(400);
+		throw new Error("New password must be different from current password");
+	}
+
+	if(!validatePassword(newPassword)) {
+		res.status(400);
+		throw new Error("New password must be at least 6 characters long and include uppercase, lowercase, number, and special character");
+	}
+
+	const isMatch = await bcrypt.compare(currentPassword, userToUpdate.password);
+
+	if (!isMatch) {
+		res.status(400);
+		throw new Error("Current password is incorrect");
+	}
+
+	userToUpdate.password = newPassword;
+	await userToUpdate.save();
+	return res.status(200).json({ message: "Password changed successfully" });
 });
