@@ -32,3 +32,9 @@ export const sanitizeUser = (user) => ({
 	email: user.email,
 	phone: user.phone
 });
+
+export const assertOwnership = (resource, adminId, message = 'Not authorized') => {
+	if (!resource || resource.admin_id.toString() !== adminId) {
+		throw new ApiError(message, 403);
+	}
+};

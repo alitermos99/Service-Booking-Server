@@ -1,5 +1,7 @@
 import Service from '../models/Service.js';
-import ApiError from './../errors/ApiError.js';
+import ApiError from '../errors/ApiError.js';
+import { getServiceByIdOrThrow } from '../utils/serviceUtils.js'
+import { assertOwnership } from '../utils/authUtils.js';
 
 export const createAService = async (serviceData, adminId) => {
 	const { title, description, price, duration } = serviceData;
@@ -34,16 +36,9 @@ export const getAllServices = async (adminId) => {
 }
 
 export const updateAService = async (serviceId, updateData, adminId) => {
-	const service = await Service.findById(serviceId);
+	const service = await getServiceByIdOrThrow(serviceId);
 	const { title, description, price, duration } = updateData;
-
-	if (!service) {
-		throw new ApiError('Service not found', 404);
-	}
-
-	if(service.admin_id.toString() !== adminId) {
-		throw new ApiError('Not authorized to update this service', 403);
-	}
+	assertOwnership(service, adminId, 'Not authorized to update this service');
 
 	Object.assign(service, { title: title || service.title, description: description 
 		|| service.description, price: price || service.price, duration: duration || service.duration 
@@ -54,15 +49,8 @@ export const updateAService = async (serviceId, updateData, adminId) => {
 };
 
 export const deleteAService = async (serviceId, adminId) => {
-	const service = await Service.findById(serviceId);
-
-	if (!service) {
-		throw new ApiError('Service not found', 404);
-	}
-
-	if(service.admin_id.toString() !== adminId) {
-		throw new ApiError('Not authorized to delete this service', 403);
-	}
+	const service = await getServiceByIdOrThrow(serviceId);
+	assertOwnership(service, adminId, 'Not authorized to delete this service');
 
 	await service.remove();
 	return service;
