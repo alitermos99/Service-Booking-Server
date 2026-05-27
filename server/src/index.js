@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import errorMiddleware from './middlewares/errorMiddleware.js';
 import authRoutes from './routes/authRoute.js';
 import serviceRoutes from './routes/serviceRoute.js';
+import appointmentRoutes from './routes/appointmentRoute.js';
 
 const app = express();
 app.use(express.json());
@@ -20,8 +21,10 @@ app.get('/', (req, res) => {
 
 // Use auth routes
 app.use('/api/v1/auth', authRoutes);
-// User service routes
+// Use service routes
 app.use('/api/v1/services', serviceRoutes);
+// Use Appointment routes
+app.use('/api/v1/appointments', appointmentRoutes);
 
 // Error middleware MUST be last
 app.use(errorMiddleware);

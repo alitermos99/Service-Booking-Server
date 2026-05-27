@@ -1,13 +1,13 @@
+import asyncHandler from "express-async-handler";
 import {
 	createAnAppointment,
 	getAUserAppointments,
 	cancelAnAppointment
-} from '../services/appointmentService';
+} from '../services/appointmentService.js';
 
 export const createAppointment = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-	const { startTime, notes } = req.body;
-	const appointment = await createAnAppointment({ startTime, notes }, id, req.user.id);
+	const { service_id, startTime, notes } = req.body;
+	const appointment = await createAnAppointment({ service_id, startTime, notes }, req.user.id);
 
 	return res.status(200).json({
 		message: "Appointment created successfully",
