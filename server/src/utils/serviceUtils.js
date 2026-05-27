@@ -5,7 +5,7 @@ export const getServiceByIdOrThrow = async (serviceId) => {
 	const service = await Service.findById(serviceId);
 
 	if (!service) {
-		throw new ApiError("service not found", 404);
+		throw new ApiError("Service not found", 404);
 	}
 
 	return service;
