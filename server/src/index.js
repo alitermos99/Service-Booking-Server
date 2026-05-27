@@ -4,6 +4,7 @@ import connectDB from './config/db.js';
 import cookieParser from "cookie-parser";
 import errorMiddleware from './middlewares/errorMiddleware.js';
 import authRoutes from './routes/authRoute.js';
+import serviceRoutes from './routes/serviceRoute.js';
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,8 @@ app.get('/', (req, res) => {
 
 // Use auth routes
 app.use('/api/v1/auth', authRoutes);
+// User service routes
+app.use('/api/v1/services', serviceRoutes);
 
 // Error middleware MUST be last
 app.use(errorMiddleware);

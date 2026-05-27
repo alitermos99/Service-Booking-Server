@@ -1,19 +1,11 @@
 import Service from '../models/Service.js';
-import { validationResult } from 'express-validator';
-import ApiError from './../errors/ApiError';
+import { body } from 'express-validator';
+import ApiError from './../errors/ApiError.js';
 import asyncHandler from "express-async-handler";
-
-const handleValidationErrors = (req, res) => {
-	const errors = validationResult(req);
-
-	if (!errors.isEmpty()) {
-		throw new ApiError(errors.array().join(', '), 400);
-	}
-};
 
 // 1. CREATE SERVICE
 // We define the validation rules array here to keep the controller clean
-const createServiceRules = [
+export const createServiceRules = [
 	// Title: Must exist, be string, and be at least 3 chars long
 	// body('field_name').validation_chain
 	body('title').notEmpty().withMessage('Title is required').isLength({ min: 3 }),
@@ -23,9 +15,6 @@ const createServiceRules = [
 ];
 
 export const createService = asyncHandler(async (req, res) => {
-	const errors = handleValidationErrors(req, res);
-	if (errors) return; // If errors exist, handleValidationErrors sent the response
-
 	const { title, description, price, duration } = req.body;
 
 	const service = new Service({

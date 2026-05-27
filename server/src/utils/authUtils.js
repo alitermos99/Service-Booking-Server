@@ -7,9 +7,9 @@ export const COOKIE_OPTIONS = {
 	maxAge: 24 * 60 * 60 * 1000
 };
 
-export const generateAuthToken = (userId) => {
+export const generateAuthToken = (userId, userRole) => {
 	return jwt.sign(
-		{ id: userId },
+		{ id: userId, role: userRole },
 		process.env.JWT_SECRET,
 		{ expiresIn: "24h" }
 	);

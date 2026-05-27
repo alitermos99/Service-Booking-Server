@@ -16,7 +16,7 @@ export const register = asyncHandler(async (req, res) => {
 
 	res.cookie(
 		"token",
-		generateAuthToken(user._id),
+		generateAuthToken(user._id, user.role),
 		COOKIE_OPTIONS
 	);
 
@@ -32,7 +32,7 @@ export const login = asyncHandler(async (req, res) => {
 
 	res.cookie(
 		"token",
-		generateAuthToken(user._id),
+		generateAuthToken(user._id, user.role),
 		COOKIE_OPTIONS
 	);
 
