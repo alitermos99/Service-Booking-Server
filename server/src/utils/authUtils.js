@@ -26,13 +26,6 @@ export const generatePasswordResetToken = (userId) => {
 	);
 };
 
-export const sanitizeUser = (user) => ({
-	_id: user._id,
-	name: user.name,
-	email: user.email,
-	phone: user.phone
-});
-
 export const assertOwnership = (resource, adminId, message = 'Not authorized') => {
 	if (!resource || resource.admin_id.toString() !== adminId) {
 		throw new ApiError(message, 403);

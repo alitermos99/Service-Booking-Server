@@ -8,7 +8,8 @@ import {
 	resetUserPassword, 
 	getUserProfile 
 } from "../services/authService.js";
-import { COOKIE_OPTIONS, sanitizeUser, generateAuthToken } from "../utils/authUtils.js";
+import { sanitizeUser } from '../utils/userUtils.js'
+import { COOKIE_OPTIONS, generateAuthToken } from "../utils/authUtils.js";
 
 export const register = asyncHandler(async (req, res) => {
 	const { name, email, password, phone } = req.body;
