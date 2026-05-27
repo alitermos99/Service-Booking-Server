@@ -1,4 +1,4 @@
-import { validatePassword } from "./passwordValidator.js";
+import { validatePassword } from "../validators/passwordValidator.js";
 
 export const validatePasswordOrThrow = (password) => {
 	if (!validatePassword(password)) {
