@@ -33,7 +33,11 @@ const appointmentSchema = new mongoose.Schema(
 		notes: {
 			type: String,
 			default: ""
-		}
+		},
+		paymentIntentId: {
+			type: String,
+			default: null
+		},
 	},
 	{
 		timestamps: true
