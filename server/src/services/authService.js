@@ -35,10 +35,6 @@ export const loginUser = async ({ email, password }) => {
 		throw new ApiError("Email and password are required", 400);
 	}
 
-	if (!email || !password) {
-		throw new ApiError("Email and password are required", 400);
-	}
-
 	const user = await getUserByEmailOrThrow(email);
 	if (
 		!user ||
@@ -93,10 +89,6 @@ export const changeUserPassword = async (userId, { currentPassword, newPassword 
 
 export const forgotUserPassword = async ({ email }) => {
 	if (!email) {
-		throw new ApiError("Email is required", 400);
-	}
-
-	if(!email) {
 		throw new ApiError("Email is required", 400);
 	}
 
