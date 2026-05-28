@@ -6,6 +6,7 @@ import errorMiddleware from './middlewares/errorMiddleware.js';
 import authRoutes from './routes/authRoute.js';
 import serviceRoutes from './routes/serviceRoute.js';
 import appointmentRoutes from './routes/appointmentRoute.js';
+import reviewRoutes from './routes/reviewRoute.js';
 import stripeRoutes from './routes/stripeRoute.js';
 import stripeWebhookRoutes from './routes/stripeWebhookRoute.js';
 
@@ -30,6 +31,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/services', serviceRoutes);
 // Use Appointment routes
 app.use('/api/v1/appointments', appointmentRoutes);
+// Use Review routes
+app.use('/api/v1/reviews', reviewRoutes);
 // Use Stripe routes
 app.use("/api/v1/stripe", stripeRoutes);
 
