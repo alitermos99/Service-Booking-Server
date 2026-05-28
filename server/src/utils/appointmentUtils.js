@@ -21,3 +21,23 @@ export const getOverlappingAppointment = async (startDate, endDate) => {
 		throw new ApiError('You already have an appointment at this time', 400);
 	}
 };
+
+export const getAppointmentWithParentServiceObject = async (appointmentId) => {
+	const appointment = await Appointment.findById(appointmentId).populate("service_id");
+
+	if (!appointment) {
+		throw new ApiError("Appointment not found", 404);
+	}
+
+	return appointment;
+}
+
+export const getAppointmentByPaymentIntentId = async (paymentIntentId) => {
+	const appointment = await Appointment.findOne({ paymentIntentId });
+
+	if (!appointment) {
+		throw new ApiError("Appointment not found", 404);
+	}
+
+	return appointment;
+}
