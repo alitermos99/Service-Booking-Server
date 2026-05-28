@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from 'express';
 import dotenv from "dotenv";
 import connectDB from './config/db.js';
@@ -13,6 +14,13 @@ import stripeWebhookRoutes from './routes/stripeWebhookRoute.js';
 const app = express();
 app.use(cookieParser());
 dotenv.config();
+
+app.use(
+	cors({
+		origin: process.env.CLIENT_URL,
+		credentials: true
+	})
+);
 
 // Connect to MongoDB
 connectDB();

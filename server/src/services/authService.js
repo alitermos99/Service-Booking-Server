@@ -94,7 +94,7 @@ export const forgotUserPassword = async ({ email }) => {
 
 	const user = await getUserByEmailOrThrow(email);
 	const resetToken = generatePasswordResetToken(user._id);
-	const url = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+	const url = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
 
 	await transporter.sendMail({
 		to: user.email,
