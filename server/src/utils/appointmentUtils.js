@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import ApiError from "../errors/ApiError.js";
 import Appointment from "../models/Appointment.js";
 
@@ -41,3 +42,15 @@ export const getAppointmentByPaymentIntentId = async (paymentIntentId) => {
 
 	return appointment;
 }
+
+export const calculateAndValidateTimeRange = async (startTime, duration) => {
+	const start = dayjs(startTime);
+	const end = start.add(duration, "minute");
+
+	await getOverlappingAppointment(start.toDate(), end.toDate());
+
+	return {
+		start: start.toDate(),
+		end: end.toDate()
+	};
+};

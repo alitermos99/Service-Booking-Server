@@ -1,8 +1,13 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import ApiError from '../errors/ApiError.js';
 import Appointment from '../models/Appointment.js'
-import { getAppointmentOrThrow, getOverlappingAppointment } from '../utils/appointmentUtils.js';
 import { getServiceByIdOrThrow } from "../utils/serviceUtils.js";
+import { assertOwnership } from '../utils/authUtils.js';
+import { 
+	getAppointmentOrThrow, 
+	getAppointmentWithParentServiceObject,
+	calculateAndValidateTimeRange 
+} from '../utils/appointmentUtils.js';
 
 export const createAnAppointment = async ({ service_id, startTime, notes }, userId) => {
 	if(!startTime) {
@@ -10,15 +15,16 @@ export const createAnAppointment = async ({ service_id, startTime, notes }, user
 	}
 
 	const service = await getServiceByIdOrThrow(service_id);
-	const start = dayjs(startTime);
-	const end = start.add(service.duration, 'minute');
-	await getOverlappingAppointment(start.toDate(), end.toDate());
+	const { start, end } = await calculateAndValidateTimeRange(
+		startTime,
+		service.duration
+	);
 
 	const appointment = await Appointment.create({
 		service_id,
-		startTime: start.toDate(),
+		startTime: start,
 		notes,
-		endTime: end.toDate(),
+		endTime: end,
 		user_id: userId
 	})
 
@@ -30,12 +36,29 @@ export const getAUserAppointments = async (userId) => {
 	return appointments;
 }
 
-export const cancelAnAppointment = async (appointmentId) => {
-	const appointment = await getAppointmentOrThrow(appointmentId);
-	
-	if(!appointment) {
-		throw new ApiError('Appointment not found', 404);
+export const updateAnAppointment = async ({ startTime, notes }, appointmentId, userId) => {
+	const appointment = await getAppointmentWithParentServiceObject(appointmentId);
+	assertOwnership(appointment, "user_id", userId, 'Not authorized to update this appointment');
+
+	if (startTime && dayjs(startTime).valueOf() !== dayjs(appointment.startTime).valueOf()) {
+		const { start, end } = await calculateAndValidateTimeRange(
+			startTime,
+			appointment.service_id.duration
+		);
+
+		appointment.startTime = start;
+		appointment.endTime = end;
 	}
+
+	appointment.notes = notes || appointment.notes;
+
+	await appointment.save();
+	return appointment;
+};
+
+export const cancelAnAppointment = async (appointmentId, userId) => {
+	const appointment = await getAppointmentOrThrow(appointmentId);
+	assertOwnership(appointment, "user_id", userId, 'Not authorized to delete this appointment');
 
 	appointment.status = 'cancelled';
 	await appointment.save();
