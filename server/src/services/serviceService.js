@@ -30,6 +30,11 @@ export const createAService = async (serviceData, adminId) => {
 	return service;
 };
 
+export const getAService = async (serviceId) => {
+	const service = await getServiceByIdOrThrow(serviceId);
+	return service;
+}
+
 export const getAllServices = async (adminId) => {
 	const services = await Service.find({ admin_id: adminId }).sort({ createdAt: -1 });
 	return services;
