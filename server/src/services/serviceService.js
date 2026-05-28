@@ -32,6 +32,8 @@ export const createAService = async (serviceData, adminId) => {
 
 export const getAService = async (serviceId) => {
 	const service = await getServiceByIdOrThrow(serviceId);
+	assertOwnership(service, "admin_id", adminId, 'Not authorized to see this service');
+
 	return service;
 }
 
