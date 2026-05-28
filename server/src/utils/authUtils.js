@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import ApiError from "../errors/ApiError.js";
 
 export const COOKIE_OPTIONS = {
 	httpOnly: true,

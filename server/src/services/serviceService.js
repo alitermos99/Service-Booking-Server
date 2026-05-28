@@ -50,7 +50,7 @@ export const updateAService = async (serviceId, updateData, adminId) => {
 
 export const deleteAService = async (serviceId, adminId) => {
 	const service = await getServiceByIdOrThrow(serviceId);
-	assertOwnership(service, "admin_id", adminId, 'Not authorized to update this service');
+	assertOwnership(service, "admin_id", adminId, 'Not authorized to delete this service');
 
 	await service.remove();
 	return service;

@@ -14,7 +14,7 @@ export const registerUser = async ({ name, email, password, phone = '' }) => {
 
 	validatePasswordOrThrow(password);
 
-	const existingUser = await getUserByEmailOrThrow(email);
+	const existingUser = await User.findOne({ email });
 
 	if (existingUser) {
 		throw new ApiError("Email already in use", 400);
