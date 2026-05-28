@@ -54,3 +54,14 @@ export const calculateAndValidateTimeRange = async (startTime, duration) => {
 		end: end.toDate()
 	};
 };
+
+export const sanitizeAppointment = (appointment) => {
+	const object = appointment.toObject();
+
+	delete object.__v;
+	delete object.createdAt;
+	delete object.updatedAt;
+	delete object.paymentIntentId;
+
+	return object;
+};

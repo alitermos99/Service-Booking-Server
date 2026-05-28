@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
+import { sanitizeAppointment } from "../utils/appointmentUtils.js";
 import {
 	createAnAppointment,
+	getAUserAppointment,
 	getAUserAppointments,
 	updateAnAppointment,
 	cancelAnAppointment
@@ -12,13 +14,27 @@ export const createAppointment = asyncHandler(async (req, res) => {
 
 	return res.status(200).json({
 		message: "Appointment created successfully",
-		appointment
+		appointment: sanitizeAppointment(appointment)
+	});
+});
+
+export const getUserAppointment = asyncHandler(async (req, res) => {
+	const { id } = req.params;
+	const appointment = await getAUserAppointment(id, req.user.id);
+
+	return res.status(200).json({
+		appointment: sanitizeAppointment(appointment)
 	});
 });
 
 export const getUserAppointments = asyncHandler(async (req, res) => {
 	const appointments = await getAUserAppointments(req.user.id);
-	return res.status(200).json(appointments);
+
+	const sanitizedAppointments = appointments.map(appointment => {
+		return sanitizeAppointment(appointment);
+	})
+
+	return res.status(200).json(sanitizedAppointments);
 });
 
 export const updateAppointment = asyncHandler(async (req, res) => {
@@ -28,13 +44,13 @@ export const updateAppointment = asyncHandler(async (req, res) => {
 
 	return res.status(200).json({
 		message: "Appointment updated successfully",
-		appointment
+		appointment: sanitizeAppointment(appointment)
 	})
 });
 
 export const cancelAppointment = asyncHandler(async (req, res) => {
 	const { id } = req.params;
-	await cancelAnAppointment(id);
+	await cancelAnAppointment(id, req.user.id);
 
 	return res.status(200).json({
 		message: "Appointment cancelled"

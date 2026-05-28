@@ -31,6 +31,13 @@ export const createAnAppointment = async ({ service_id, startTime, notes }, user
 	return appointment;
 }
 
+export const getAUserAppointment = async (appointmentId, userId) => {
+	const appointment = await getAppointmentOrThrow(appointmentId);
+	assertOwnership(appointment, "user_id", userId, 'Not authorized to see this appointment');
+
+	return appointment;
+}
+
 export const getAUserAppointments = async (userId) => {
 	const appointments = await Appointment.find({ user_id: userId });
 	return appointments;
@@ -58,7 +65,7 @@ export const updateAnAppointment = async ({ startTime, notes }, appointmentId, u
 
 export const cancelAnAppointment = async (appointmentId, userId) => {
 	const appointment = await getAppointmentOrThrow(appointmentId);
-	assertOwnership(appointment, "user_id", userId, 'Not authorized to delete this appointment');
+	assertOwnership(appointment, "user_id", userId, 'Not authorized to cancel this appointment');
 
 	appointment.status = 'cancelled';
 	await appointment.save();
