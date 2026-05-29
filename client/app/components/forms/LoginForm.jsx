@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import FormField from '../ui/FormField'
 import Link from 'next/link'
 import PasswordField from '../ui/PasswordField'
-import Spacer from '../ui/Spacer'
 import Button from '../ui/Button'
+import axios from 'axios'
 
 const LoginForm = () => {
     const [form, setForm] = useState({
@@ -11,6 +11,7 @@ const LoginForm = () => {
         password: '',
         remember: false
     });
+    const [error, setError] = useState(null);
 
     const handleChange = (event) => {
         const{ name, value, type, checked } = event.target;
@@ -21,9 +22,20 @@ const LoginForm = () => {
         }))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("FORM DATA:", form);
+
+        try {
+            const response = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + '/api/v1/auth/login',
+                {
+                    email: form.email,
+                    password: form.password
+                }
+            );
+            const data = response.data;
+        } catch (error) {
+            setError(error.response);
+        }
     };
 
     return (
@@ -38,8 +50,6 @@ const LoginForm = () => {
                     placeholder="you@example.com"
                     onChange={handleChange}
                 />
-
-                <Spacer />
 
                 <PasswordField
                     className="input-field"
