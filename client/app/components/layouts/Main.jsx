@@ -2,7 +2,7 @@ import React from 'react'
 
 const Main = ({ children }) => {
     return (
-        <div className="min-h-screen hero-grid flex items-center justify-center p-4 relative">
+        <div className="relative min-h-dvh overflow-hidden flex items-center justify-center p-4 hero-grid">
             { children }
         </div>
     )
