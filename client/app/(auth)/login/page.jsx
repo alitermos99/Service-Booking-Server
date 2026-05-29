@@ -7,7 +7,7 @@ import LoginForm from "@/app/components/forms/LoginForm";
 
 export default function LoginPage() {
     return (
-        <Main>
+        <Main className={'animate-fade-up'}>
             {/* ORBS */}
             <div className="absolute orb w-96 h-96 bg-[#6c63ff] opacity-20 top-0 left-0 -translate-x-1/3 -translate-y-1/3" />
             <div className="absolute orb w-80 h-80 bg-[#38bdf8] opacity-10 bottom-0 right-0 translate-x-1/3 translate-y-1/3" />
