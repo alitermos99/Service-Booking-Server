@@ -1,9 +1,9 @@
 'use client';
 
-import Logo from "@/app/components/ui/Logo";
 import Card from "@/app/components/ui/Card";
 import Main from "@/app/components/layouts/Main";
 import LoginForm from "@/app/components/forms/LoginForm";
+import AuthHeader from "@/app/components/auth/AuthHeader";
 
 export default function LoginPage() {
     return (
@@ -14,17 +14,13 @@ export default function LoginPage() {
 
             <div className="relative z-10 w-full max-w-md">
                 {/* LOGO */}
-                <div className="text-center mb-8">
-                    <Logo />
-
-                    <h1 className="text-2xl font-bold">Welcome back</h1>
-                    <p className="text-sm text-[#8888aa] mt-1">
-                        Sign in to your account to continue
-                    </p>
-                </div>
+                <AuthHeader 
+                    title="Welcome back"
+                    subtitle="Sign in to your account to continue"
+                />
 
                 {/* CARD */}
-                <Card>
+                <Card className="p-8 rounded-3xl">
                     {/* FORM */}
                     <LoginForm />
                 </Card>
