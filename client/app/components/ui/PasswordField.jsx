@@ -3,7 +3,7 @@ import FormField from './FormField'
 import { useState } from 'react';
 
 const PasswordField = ({ label = "Password", ...rest }) => {
-    const[show, setShow] = useState(false);
+    const [show, setShow] = useState(false);
 
     return (
         <div className="relative">
