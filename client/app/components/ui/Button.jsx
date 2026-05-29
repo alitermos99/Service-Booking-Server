@@ -5,7 +5,8 @@ const Button = ({ label, className , ...rest }) => {
         <>
         <button
             type='submit'
-            className={className}
+            className={className + ' cursor-pointer'}
+            { ...rest }
         >
             { label }
         </button></>
