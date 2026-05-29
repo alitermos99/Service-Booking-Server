@@ -3,7 +3,7 @@ import FormField from '../ui/FormField'
 import Link from 'next/link'
 import PasswordField from '../ui/PasswordField'
 import Button from '../ui/Button'
-import axios from 'axios'
+import { login } from '@/app/services/authService';
 
 const LoginForm = () => {
     const [form, setForm] = useState({
@@ -26,15 +26,11 @@ const LoginForm = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + '/api/v1/auth/login',
-                {
-                    email: form.email,
-                    password: form.password
-                }
-            );
-            const data = response.data;
+            const response = await login(form);
+            console.log('@@@ response ', response);
         } catch (error) {
-            setError(error.response);
+            setError(error.response?.data);
+            console.log('@@@ error ', error.response?.data);
         }
     };
 
