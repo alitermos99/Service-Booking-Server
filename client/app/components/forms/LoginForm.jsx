@@ -35,6 +35,7 @@ const LoginForm = () => {
         <>
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <FormField
+                    required
                     label={'Email address'}
                     type="email"
                     name="email"
@@ -45,6 +46,7 @@ const LoginForm = () => {
                 />
 
                 <PasswordField
+                    required
                     className="input-field"
                     name="password"
                     value={form.password}
