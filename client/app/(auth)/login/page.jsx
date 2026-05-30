@@ -20,7 +20,7 @@ export default function LoginPage() {
                 />
 
                 {/* CARD */}
-                <Card className="p-8 rounded-3xl">
+                <Card>
                     {/* FORM */}
                     <LoginForm />
                 </Card>
