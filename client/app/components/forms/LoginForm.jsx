@@ -4,6 +4,7 @@ import Link from 'next/link'
 import PasswordField from '../ui/PasswordField'
 import Button from '../ui/Button'
 import { login } from '@/app/services/authService';
+import AuthFooter from '../auth/AuthFooter'
 
 const LoginForm = () => {
     const [form, setForm] = useState({
@@ -64,7 +65,7 @@ const LoginForm = () => {
                         onChange={handleChange}
                     />
 
-                    <span className="text-sm text-[#8888aa]">
+                    <span className="text-sm text-muted">
                         Remember me for 30 days
                     </span>
                 </div>
@@ -76,13 +77,11 @@ const LoginForm = () => {
                 />
             </form>
 
-            <p className="text-center text-sm text-[#8888aa] mt-6">
-                Don&apos;t have an account?{" "}
-
-                <Link href="/register" className="text-[#6c63ff]">
-                    Create one →
-                </Link>
-            </p>
+            <AuthFooter 
+                text="Don&apos;t have an account?"
+                linkText="Create one →"
+                link="/register"
+            />
         </>
     )
 }

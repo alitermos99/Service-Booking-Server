@@ -22,6 +22,10 @@ body {
 }
 
 @theme {
+  --color-muted: var(--muted);
+}
+
+@theme {
   --color-card: var(--card);
   --color-accent: var(--accent);
   --animate-fade-up: fadeUp 0.5s ease forwards;
