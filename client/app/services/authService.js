@@ -8,3 +8,12 @@ export const login = async (credentials) => {
 
     return response.data;
 }
+
+export const register = async (credentials) => {
+    const response = await api.post(
+        '/api/v1/auth/register',
+        credentials
+    );
+
+    return response.data;
+}
