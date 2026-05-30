@@ -4,6 +4,7 @@ import Card from "@/app/components/ui/Card";
 import Main from "@/app/components/layouts/Main";
 import LoginForm from "@/app/components/forms/LoginForm";
 import AuthHeader from "@/app/components/auth/AuthHeader";
+import AuthFooter from "@/app/components/auth/AuthFooter";
 
 export default function LoginPage() {
     return (
@@ -23,6 +24,12 @@ export default function LoginPage() {
                 <Card>
                     {/* FORM */}
                     <LoginForm />
+
+                    <AuthFooter 
+                        text="Don&apos;t have an account?"
+                        linkText="Create one →"
+                        link="/register"
+                    />
                 </Card>
             </div>
         </Main>

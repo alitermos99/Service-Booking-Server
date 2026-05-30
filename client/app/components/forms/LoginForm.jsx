@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
 import FormField from '../ui/FormField'
-import Link from 'next/link'
 import PasswordField from '../ui/PasswordField'
 import Button from '../ui/Button'
 import { login } from '@/app/services/authService';
-import AuthFooter from '../auth/AuthFooter'
 
 const LoginForm = () => {
     const [form, setForm] = useState({
@@ -28,10 +26,8 @@ const LoginForm = () => {
 
         try {
             const response = await login(form);
-            console.log('@@@ response ', response);
         } catch (error) {
             setError(error.response?.data);
-            console.log('@@@ error ', error.response?.data);
         }
     };
 
@@ -72,16 +68,10 @@ const LoginForm = () => {
 
                 <Button 
                     label={'Sign in'}
-                    className={'block text-center btn-primary text-white font-semibold py-3 rounded-xl mt-2 w-100'}
+                    className={'block text-center btn-primary text-white font-semibold py-3 rounded-xl mt-2 w-full'}
                     type="submit"
                 />
             </form>
-
-            <AuthFooter 
-                text="Don&apos;t have an account?"
-                linkText="Create one →"
-                link="/register"
-            />
         </>
     )
 }

@@ -5,6 +5,12 @@ import Button from './Button';
 
 const LABELS = ['Weak','Fair','Good','Strong'];
 const COLORS = ['bg-weak','bg-fair','bg-good','bg-strong'];
+const TEXT_COLOR = {
+    'bg-weak': 'text-weak',
+    'bg-fair': 'text-fair',
+    'bg-good': 'text-good',
+    'bg-strong': 'text-strong'
+}
 
 const PasswordField = ({ label = "Password", showStrength = false, ...rest }) => {
     const [score, setScore] = useState(0);
@@ -62,7 +68,12 @@ const PasswordField = ({ label = "Password", showStrength = false, ...rest }) =>
                             }
                         </div>
 
-                        <span className='text-xs text-muted mt-1'>{ text }</span>
+                        <span className={`
+                            text-xs mt-1
+                            ${
+                                TEXT_COLOR[strength] ? TEXT_COLOR[strength] : 'text-muted'
+                            }
+                        `}>{ text }</span>
                     </div>
                 )
             }
