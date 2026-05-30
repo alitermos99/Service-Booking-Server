@@ -12,8 +12,8 @@ import { sanitizeUser } from '../utils/userUtils.js'
 import { COOKIE_OPTIONS, generateAuthToken } from "../utils/authUtils.js";
 
 export const register = asyncHandler(async (req, res) => {
-	const { name, email, password, phone } = req.body;
-	const user = await registerUser({ name, email, password, phone });
+	const { name, email, password, accountType, phone } = req.body;
+	const user = await registerUser({ name, email, password, accountType, phone });
 
 	res.cookie(
 		"token",

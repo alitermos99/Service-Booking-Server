@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../errors/ApiError.js";
 
+export const ACCOUNT_TYPES = {
+    customer: 'customer',
+    business: 'business'
+};
+
 export const COOKIE_OPTIONS = {
 	httpOnly: true,
 	secure: process.env.NODE_ENV === "production",

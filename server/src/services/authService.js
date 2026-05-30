@@ -4,12 +4,18 @@ import jwt from "jsonwebtoken";
 import transporter from "../services/emailService.js";
 import { getUserOrThrow, getUserByEmailOrThrow } from "../utils/userUtils.js";
 import { validatePasswordOrThrow } from "../utils/validationUtils.js";
-import { generatePasswordResetToken  } from "../utils/authUtils.js";
+import { generatePasswordResetToken, ACCOUNT_TYPES } from "../utils/authUtils.js";
 import ApiError from "../errors/ApiError.js";
 
-export const registerUser = async ({ name, email, password, phone = '' }) => {
+export const registerUser = async ({ name, email, password, accountType, phone = '' }) => {
 	if (!name || !email || !password) {
 		throw new ApiError("Name, email, and password are required", 400);
+	}
+
+	const role = ACCOUNT_TYPES[accountType];
+
+	if (!role) {
+		throw new ApiError('Unable to process request', 400);
 	}
 
 	validatePasswordOrThrow(password);
@@ -24,7 +30,8 @@ export const registerUser = async ({ name, email, password, phone = '' }) => {
 		name,
 		email,
 		password,
-		phone
+		phone,
+		role
 	});
 
 	return user;
