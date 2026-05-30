@@ -84,7 +84,6 @@ const LoginForm = () => {
                 </Link>
             </p>
         </>
-        
     )
 }
 

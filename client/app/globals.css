@@ -6,6 +6,13 @@
 
   --accent: #6c63ff;
   --muted: #8888aa;
+  --card: rgba(255, 255, 255, 0.094);
+
+  --weakpass: #f87171;
+  --fairpass: #fbbf24;
+  --goodpass: #34d399;
+  --strongpass: #34d399;
+
 }
 
 body {
@@ -15,8 +22,14 @@ body {
 }
 
 @theme {
+  --color-card: var(--card);
   --color-accent: var(--accent);
   --animate-fade-up: fadeUp 0.5s ease forwards;
+
+  --color-weak: var(--weakpass);
+  --color-fair: var(--fairpass);
+  --color-good: var(--goodpass);
+  --color-strong: var(--strongpass);
 }
 
 @keyframes fadeUp {
